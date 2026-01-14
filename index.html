@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Team Outing Survey</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      padding: 30px;
+    }
+    .container {
+      max-width: 500px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      margin: auto;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 15px;
+      background: #007bff;
+      border: none;
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    canvas {
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>Team Outing Interest Survey</h2>
+
+  <form id="surveyForm">
+    <label>
+      <input type="radio" name="choice" value="Area 83 - Saturday" required>
+      Area 83 – Saturday (Day Outing)
+    </label><br><br>
+
+    <label>
+      <input type="radio" name="choice" value="Area 83 - Sunday">
+      Area 83 – Sunday (Day Outing)
+    </label><br><br>
+
+    <label>
+      <input type="radio" name="choice" value="5 Star Team Lunch">
+      Team Lunch at 5-Star Hotel
+    </label><br><br>
+
+    <label>
+      <input type="radio" name="choice" value="None">
+      None
+    </label>
+
+    <button type="submit">Submit Response</button>
+  </form>
+
+  <canvas id="resultsChart"></canvas>
+</div>
+
+<script>
+  const form = document.getElementById('surveyForm');
+  const ctx = document.getElementById('resultsChart').getContext('2d');
+
+  let dataStore = JSON.parse(localStorage.getItem('surveyData')) || {
+    "Area 83 - Saturday": 0,
+    "Area 83 - Sunday": 0,
+    "5 Star Team Lunch": 0,
+    "None": 0
+  };
+
+  function saveData() {
+    localStorage.setItem('surveyData', JSON.stringify(dataStore));
+  }
+
+  function renderChart() {
+    if (window.chart) {
+      window.chart.destroy();
+    }
+
+    window.chart = new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: Object.keys(dataStore),
+        datasets: [{
+          data: Object.values(dataStore)
+        }]
+      }
+    });
+  }
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    const choice = document.querySelector('input[name="choice"]:checked').value;
+    dataStore[choice]++;
+    saveData();
+    renderChart();
+    form.reset();
+  });
+
+  renderChart();
+</script>
+
+</body>
+</html>
