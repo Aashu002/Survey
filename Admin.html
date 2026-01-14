@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Results</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      padding: 30px;
+    }
+    .container {
+      max-width: 700px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      margin: auto;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    button {
+      padding: 10px;
+      margin-top: 15px;
+      background: #dc3545;
+      border: none;
+      color: white;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    table {
+      width: 100%;
+      margin-top: 20px;
+      border-collapse: collapse;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container" id="loginBox">
+  <h2>Admin Login</h2>
+  <input type="password" id="password" placeholder="Enter admin password">
+  <button onclick="login()">Login</button>
+</div>
+
+<div class="container" id="adminPanel" style="display:none;">
+  <h2>Survey Results</h2>
+  <canvas id="chart"></canvas>
+
+  <h3>Individual Responses</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Choice</th>
+      </tr>
+    </thead>
+    <tbody id="responses"></tbody>
+  </table>
+
+  <button onclick="resetData()">Reset All Results</button>
+</div>
+
+<script>
+  const ADMIN_PASSWORD = "admin123"; // change this
+
+  let data = JSON.parse(localStorage.getItem('surveyData'));
+
+  function login() {
+    if (document.getElementById('password').value === ADMIN_PASSWORD) {
+      document.getElementById('loginBox').style.display = "none";
+      document.getElementById('adminPanel').style.display = "block";
+      loadResults();
+    } else {
+      alert("Wrong password");
+    }
+  }
+
+  function loadResults() {
+    if (!data) return;
+
+    const ctx = document.getElementById('chart').getContext('2d');
+    new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: Object.keys(data.results),
+        datasets: [{ data: Object.values(data.results) }]
+      }
+    });
+
+    const tbody = document.getElementById('responses');
+    data.responses.forEach(r => {
+      tbody.innerHTML += `<tr><td>${r.name}</td><td>${r.choice}</td></tr>`;
+    });
+  }
+
+  function resetData() {
+    if (!confirm("Are you sure you want to reset all data?")) return;
+
+    localStorage.removeItem('surveyData');
+    alert("Survey data reset");
+    location.reload();
+  }
+</script>
+
+</body>
+</html>
